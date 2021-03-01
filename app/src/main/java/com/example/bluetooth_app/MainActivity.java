@@ -3,7 +3,13 @@ package com.example.bluetooth_app;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -14,10 +20,28 @@ public class MainActivity extends AppCompatActivity {
     TextView status;
     ListView listView;
     Button search;
-    BluetoothAdapter bluetooth;
+    BluetoothAdapter bluetoothAdapter;
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+            Log.i("Action",action);
+
+            if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+                status.setText("Finished");
+                search.setEnabled(true);
+            }
+        }
+    };
+
+
+
+
     public void searchclicked (View view){
         status.setText("Searching.........");
         search.setEnabled(false);
+        bluetoothAdapter.startDiscovery();
     }
 
 
@@ -29,5 +53,14 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.list_view);
         status = findViewById(R.id.status);
         search = findViewById(R.id.search);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        registerReceiver( broadcastReceiver, intentFilter);
+
     }
 }
