@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     Button search;
     BluetoothAdapter bluetoothAdapter;
     ArrayList<String> bluetoothDevice = new ArrayList<String>();
+    ArrayList<String> addresses = new ArrayList<String>();
     ArrayAdapter arrayAdapter;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -43,18 +44,21 @@ public class MainActivity extends AppCompatActivity {
                 String address = device.getAddress();
                 String rssi =   Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI , Short.MIN_VALUE));
 
-              Log.i("Device Found"," name--"+name+ " " +"address---- "+address+ " " +"strenght--- "+rssi+ " " );
-                String temp="";
-                if(name.equals("")){
-                    temp=temp+(address + " signal: "+ rssi + "db");
-                }
-                else{
-                    temp=temp+(name + "signal strength "+ rssi + "db");
-                }
-                if(! bluetoothDevice.contains(temp)){
+                if(!addresses.contains(address)){
+                    addresses.add(address);
+                    Log.i("Device Found"," name--"+name+ " " +"address---- "+address+ " " +"strenght--- "+rssi+ " " );
+                    String temp="";
+                    if(name.equals("")){
+                        temp=temp+(address + " signal: "+ rssi + "db");
+                    }
+                    else{
+                        temp=temp+(name + "signal strength "+ rssi + "db");
+                    }
+
                     bluetoothDevice.add(temp);
+                    arrayAdapter.notifyDataSetChanged();
                 }
-                arrayAdapter.notifyDataSetChanged();
+
             }
         }
     };
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         status.setText("Searching.........");
         search.setEnabled(false);
         bluetoothDevice.clear();
+        addresses.clear();
         bluetoothAdapter.startDiscovery();
     }
 
